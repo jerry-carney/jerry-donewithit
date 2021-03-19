@@ -1,0 +1,995 @@
+REACT NATIVE DEVELOPER NOTES
+Developing Mobile Apps
+
+Prerequisites: JavaScript, React
+
+Requires Node 12+
+$ node -v
+v12.18.3
+
+Install expo-cli (As Admin)
+$ npm i -g expo-cli
+:
++ expo-cli@4.1.6
+
+Install Expo Client (Nametag) to your I phone or Android phone.
+* I search for 'Expo Client', but only found an installed 'Expo Go'
+
+Use VS Code as you IDE.
+Add Extensions:
+- React Native Tools
+- React-Native/React/Redux snippets for es6/es7
+- Prettier
+- Material Icon Theme
+
+Creating first project
+$ cd C:\JerryC\Development\Courses\ReactNativePractice\projects
+$ expo init DoneWithIt
+? Choose a template: » - Use arrow-keys. Return to submit.
+    ----- Managed workflow -----
+>   blank                 a minimal app as clean as an empty canvas    **** {Choose blank Managed workflow}
+    blank (TypeScript)    same as blank but with TypeScript configuration
+    tabs (TypeScript)     several example screens and tabs using react-navigation and TypeScript
+    ----- Bare workflow -----
+    minimal               bare and minimal, just the essentials to get you started
+    minimal (TypeScript)  same as minimal but with TypeScript configuration
+√ Choose a template: » blank                 a minimal app as clean as an empty canvas
+√ Downloaded and extracted project files.
+� Using npm to install packages.
+√ Installed JavaScript dependencies.
+
+✅ Your project is ready!
+
+To run your project, navigate to the directory and run one of the following npm commands.
+
+- cd DoneWithIt
+- npm start # you can open iOS, Android, or web from here, or run them directly with the commands below.
+- npm run android
+- npm run ios # requires an iOS device or macOS for access to an iOS simulator
+- npm run web
+
+$ cd DoneWithIt
+$ code .
+:
+In terminal window
+$ npm start
+Starting project at C:\JerryC\Development\Courses\ReactNativePractice\projects\DoneWithIt
+Expo DevTools is running at http://localhost:19002
+Opening DevTools in the browser... (press shift-d to disable)
+Starting Metro Bundler
+
+exp://192.168.0.11:19000
+ 
+SCAN IMAGE
+
+To run the app, choose one of:
+ › Scan the QR code above with the Expo app (Android) or the Camera app (iOS).
+ › Press a for Android emulator, or w to run on web.
+ › Press e to send a link to your phone with email.
+
+*******--------> Enter a  // AVD and Expo Go become aware of application
+
+Press ? to show a list of all available commands.
+Logs for your project will appear below. Press Ctrl+C to exit.
+
+- ALSO: a 	Metro Bundler is launched in Chrome
+(JavaScript Bundler for React Native, reponsible for compiling all of our JavaScript files into one file)
+http://localhost:19002/
+
+Installing an Android Emulator from
+https://developer.android.com/studio
+{Download Android Studio}
+************ See Course for more indepth instructions for creating an AVD
+See Getting Started: 9 - Running on an Android Emulated phone
+1. AVD - Android Virtual Device on PC (Cntrl-M to get to Dev mode)
+2. Expo Go - Droid App, Scan QR Code to run (Shake phone to get to Dev mode)
+
+DEBUGGING --------------------------------------------------
+1. console.log("App is starting")  // debug statements
+2. Cntrl-M || Cntrl-D, Cmd-D on AVD *********---> My keyboard does NOT have a Cmd key
+Therefore, debugging with Chrome does not work well, i.e.
+localhost:19001/debugger-ui/ does not work well    (GPC: Kinda works)
+---> reload app in debugger window helps*
+3. in VSCode:
+set preferences->settings->react-native.packager.port=19001
+In debug panel click "create a launch.json file".
+-----
+donewithit/.vscode/launch.json:
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug Android",
+            "cwd": "${workspaceFolder}",
+            "type": "reactnative",
+            "request": "launch",
+            "platform": "android"
+        },
+        {
+            "name": "Attach to packager",
+            "cwd": "${workspaceFolder}",
+            "type": "reactnative",
+            "request": "attach"
+        }
+    ]
+}
+-----
+DEBUG PANEL ONLY ALLOWS RESTART AND STOP OPERATIONS
+
+My OS: Windows 10 Pro
+
+inserted a break point in code at:
+-> let x = 1;
+In debug panel:
+Choose "Attach to packager" and click green run button
+OUTPUT window:
+:
+[Info] Packager started.
+-----NOTE: I ran netstat and cannot determine what port Packager is running on
+
+DEBUG CONSOLE window:
+Attaching to the application
+Starting debugger app worker.
+Established a connection with the Proxy (Packager) to the React Native application
+
+Mosh reloads AVD (so it must of been started prior)
+So I stop debugger, run app -> $npm start, then connect to AVD
+On AVD go to Dev Mode, and reload
+looks like code stopped at breakpoint, BUT the debugger only allows Restart and Stop
+
+Mosh's debugger allows All Operations and the breakpoint is highlighted
+...my $npm start is still running (with the React Native Debugger tab open), so I close
+the tab and reload from AVD which launches a React Native Debugger tab again.
+In debug panel:
+I stop the debugger.
+In the Console Window $ cntrl-C (stop native-react app)
+I notice that the AVD getting a network communication error (As I would expect!)
+I start the debugger
+From AVD, I do a reload (see spinner), then get:
+"Something went wrong.
+Network response timed out"
+
+Looks like I have "a chicken before the egg" problem here.
+
+PUBLISHING App to Expo  ---------------Dev&Test--------------------------
+NOTE: Production requires 
+expo.io/@username/app
+
+PS C:\JerryC\Development\Courses\ReactNativePractice\projects\DoneWithIt> npm start
+
+> @ start C:\JerryC\Development\Courses\ReactNativePractice\projects\DoneWithIt
+> expo start
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│                                                                         │
+│   There is a new version of expo-cli available (4.2.1).                 │
+│   You are currently using expo-cli 4.1.6                                │
+│   Install expo-cli globally using the package manager of your choice;   │
+│   for example: `npm install -g expo-cli` to get the latest version      │
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘
+Starting project at C:\JerryC\Development\Courses\ReactNativePractice\projects\DoneWithIt
+Expo DevTools is running at http://localhost:19002
+Opening DevTools in the browser... (press shift-d to disable)
+Starting Metro Bundler
+
+ exp://192.168.0.11:19000
+                                                       
+
+
+To run the app, choose one of:
+ › Scan the QR code above with the Expo app (Android) or the Camera app (iOS).
+ › Press a for Android emulator, or w to run on web.
+ › Press e to send a link to your phone with email.
+
+Press ? to show a list of all available commands.
+Logs for your project will appear below. Press Ctrl+C to exit.
+An Expo user account is required to proceed.
+√ How would you like to authenticate? » Log in with an existing Expo account
+√ Username/Email Address: ... gpcarney63@gmail.com
+√ Password: ... *********
+
+Success. You are now logged in as jerrycarney.
+Starting Metro Bundler
+Finished building JavaScript bundle in 29048ms. <-------------------*****
+
+Bundle                     Size
+┌ index.ios.js           1.3 MB
+├ index.android.js      1.29 MB
+├ index.ios.js.map         4 MB
+└ index.android.js.map  3.99 MB
+
+� JavaScript bundle sizes affect startup time. Learn more: https://expo.fyi/javascript-bundle-sizes
+
+Analyzing assets
+Saving assets
+No assets changed, skipped.
+
+Processing asset bundle patterns:
+- C:\JerryC\Development\Courses\ReactNativePractice\projects\DoneWithIt\**\*
+
+Uploading JavaScript bundles
+Starting Metro Bundler
+Finished building JavaScript bundle in 5287ms.   <-------------------*****
+
+Bundle                     Size
+┌ index.ios.js           1.3 MB
+├ index.android.js      1.29 MB
+├ index.ios.js.map         4 MB
+└ index.android.js.map  3.99 MB
+
+� JavaScript bundle sizes affect startup time. Learn more: https://expo.fyi/javascript-bundle-sizes
+
+Analyzing assets
+Saving assets
+No assets changed, skipped.
+
+Processing asset bundle patterns:
+- C:\JerryC\Development\Courses\ReactNativePractice\projects\DoneWithIt\**\*
+
+Uploading JavaScript bundles
+Starting Metro Bundler
+Finished building JavaScript bundle in 5019ms. <-------------------*****
+
+Bundle                     Size
+┌ index.ios.js           1.3 MB
+├ index.android.js      1.29 MB
+├ index.ios.js.map         4 MB
+└ index.android.js.map  3.99 MB
+
+� JavaScript bundle sizes affect startup time. Learn more: https://expo.fyi/javascript-bundle-sizes
+
+Analyzing assets
+Saving assets
+No assets changed, skipped.
+
+Processing asset bundle patterns:
+- C:\JerryC\Development\Courses\ReactNativePractice\projects\DoneWithIt\**\*
+
+Uploading JavaScript bundle
+
+	******** In parellel **********
+Metro Bundler Tab
+Publish or republish project
+Project name is found in app.json (also the slug)
+--- Publish Project
+Then prompted in project terminal window ABOVE
+√ How would you like to authenticate? » Log in with an existing Expo account
+√ Username/Email Address: ... gpcarney63@gmail.com
+√ Password: ... *********
+:
+Successfully published to https://expo.io/@jerrycarney/projects/DoneWithIt (in Metro Bundler Tab)
+I clicked on the published URL
+Another tab launched with the Expo "DoneWithIt" (I had to enter my email/passwd) to run it the 1st time
+(No Icon yet, but we will take care of that later)
+Went back to Metro Bundler Tab, Added a Description, and Republished
+app.json now contains:
+	:
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "description": "A marketplace for selling the things that you don't need any longer."
+  }
+I went back to the application tab and refreshed it
+It now has my updated Description
+Also on the tab a "Scan to open QR code", which I scanned with my real phone
+via my "Expo Go" App, and my app was displayed!
+
+******** Mosh had me fix a Auto Import Issue
+-- should not have any extensions for auto import (which I did not)
+-- added jsconfig.json under the rootdir:
+{
+    "exclude": ["node_modules"]
+}
+
+Follow Mosh for courses and discounts:
+https://twitter.com/moshhamedani
+https://www.facebook.com/programmingwithmosh/
+https://www.youtube.com/user/programmingwithmosh
+https://www.linkedin.com/in/mosh-hamedani/
+
+
+************************* Core Components and APIs ***********************
+https://reactnative.dev/
+Components: Cross Platform and some specific (Android, iOS)
+APIs: Access to Cross Platform Native functions (non UI widgets) and some specific (Android, iOS)
+
+View - (similiar to an HTML <div>) used for grouping or laying out children, I.e.: <view></view>
+And SafeAreaView - in case of a notch then it adds padding on the top  ----> NOTE: Did NOT work for me
+
+Text - <text></text>, See component Props, e.g.: numOfLines, onPress, ...
+
+Image - <image/>, Local/Static and Network images
+<Image source={require('./assets/favicon.png')}/>  //local
+console.log(require('./assets/favicon.png'));  //returns 1. Pointer to our local image
+***** Network images:
+https://picsum.photos/ (I have also used igmur.com)
+A network image requires all width and height:
+      <Image source={{
+        blurRadius={0.5}
+        fadeDuration={3000}  	  
+        width: 200,
+        height: 300,
+        uri: "https://picsum.photos/200/300"}} />
+      <StatusBar style="auto" />
+
+Touchables - TouchableHighlight, TouchableOpacity, TouchableWithoutFeedback
+Wrap <Image> block above with
+<TouchableOpacity onPress={() => console.log("Image tapped")}>
+	<Image
+		...
+	/>
+</TouchableOpacity>
+Result: On each touch (click) results in
+1. log message
+2. For a fraction of a second, it shows the background behind the image.
+If you hold down the click, then the background will show until you lift up.
+
+Button - <Button />
+      <Button
+        color="red"
+        title="Easy"
+        onPress={() => console.log("Button clicked")}
+      />
+Note: Different look on Android vs. iOS
+
+Alert - Launches an Alert Dialog with different options:
+Replace above Button onPress code with one of the following
+        //Simple alert and acknowledge (not import needed)
+        onPress={() => alert("Jerry, your barn door is open")}
+		
+        //Customized alert - Alert API
+        onPress={() => Alert.alert("Amber Alert", "7 year old Jerry is missing", [
+          {text: "Okay", onPress: () => console.log("Alert acknowledged")},
+          {text: "I Found Jerry", onPress: () => console.log("Jerry is found! Determining location...")}
+        ])}
+NOTE: Alert.prompt(...) NOT working on Android at time of Mosh's time of recording. TODO: Try it.	
+
+StyleSheet - NOTE: This is not the same as CSS, they are JavaScript properties.
+Remember, StyleSheet is an API.
+You can have in-line style attributes. NOT RECOMMENDED
+You can define multiple styles attribute sets to choose from. RECOMMENDED
+You can also combine multiple style of objects:
+ <SafeAreaView style={[styles.container, styles2]}> where the later over-rides the previous:
+ styles.container has a backgroundColor:'white'
+ and
+ styles2 has a backgroundColor:'orange'
+ Result: Orange is the background color.
+
+Also NOTE: The ReactNative team has been working on optimizations (not available at time of recording)
+
+Platform-specific code -
+within a style definition:
+paddingTop: Platform.OS === "android" ? 20 : 0,
+NOTE: Mosh's StatusBar.currentHeight value was not defined for me.
+
+
+************************* Layout  ***********************
+Dimensions -
+import {...,Dimensions} from 'react-native';
+  console.log("Screen-size:\n", Dimensions.get('screen'));
+  console.log("Window-size:\n",Dimensions.get('window'));
+Screen-size:
+ Object {
+  "fontScale": 1,
+  "height": 807.2727272727273,
+  "scale": 2.75,
+  "width": 392.72727272727275,
+}
+Window-size:
+ Object {
+  "fontScale": 1,
+  "height": 759.2727272727273,
+  "scale": 2.75,
+  "width": 392.72727272727275,
+}
+
+Detecting Orientation Changes -
+(E.g. User orients phone from portrait(vertical) to landscape(horizontal))
+in app.json:
+    "orientation": "portrait",
+changed to
+    "orientation": "default",
+https://github.com/react-native-community/hooks
+stop app, then in terminal window:
+$ npm i @react-native-community/hooks           <----***********************
++ @react-native-community/hooks@2.6.0
+added 1 package from 1 contributor and audited 1013 packages in 5.946s
+
+53 packages are looking for funding
+  run `npm fund` for details
+
+found 9 low severity vulnerabilities
+  run `npm audit fix` to fix them, or `npm audit` for details
+  
+import { useDimensions, useDeviceOrientation } from '@react-native-community/hooks';
+  console.log("Dimensions-A:\n", useDeviceOrientation());
+  console.log("Dimensions-A1:\n", useDimensions());
+Dimensions-A:
+ Object {
+  "landscape": false,
+  "portrait": true,
+}
+Dimensions-A1:
+ Object {
+  "screen": Object {
+    "fontScale": 1,
+    "height": 807.2727272727273,
+    "scale": 2.75,
+    "width": 392.72727272727275,
+  },
+  "window": Object {
+    "fontScale": 1,
+    "height": 759.2727272727273,
+    "scale": 2.75,
+    "width": 392.72727272727275,
+  },
+}
+// height changes dynamically (ONLY if in app.json: "orientation": "default",)
+      <View style={{
+  const {landscape} = useDeviceOrientation(); 
+      <View style={{
+        backgroundColor: 'dodgerblue',
+        width: '100%',
+        height: landscape ? '100%' : '30%'
+      }}></View>
+
+Flexbox -
+    <View style={{
+      backgroundColor: 'dodgerblue',
+      flex: 1, //grows to take ALL of the available space
+    }}></View>
+      flex: 0.5, //grows to take 50% of the available space
+	  
+Think of View as a container for children.
+Experimented with a Views with a View; that is, Containers within a Container.
+Lets call a sub-view == item
+- If items overflow accross the main axis, then one or more items get shunk
+  to so that other items can fit on the screen.
+- adding <flexWrap>: 'wrap' to parent view causes the items to retain their size, but wrap to the next line
+- adding alignContent: 'center' to parent view cause above result to be centered on the seconard axis
+Parent View:
+    <View style={{
+      backgroundColor: 'white',
+      flex: 1, //grows to take available space
+      flexDirection: 'row', //horizontal (primary)
+      justifyContent: 'center', //main
+      alignItems: 'center', //secondary (vertical since primary is horizontal)
+      alignContent: 'center',
+      flexWrap: 'wrap',
+    }}>
+Item:
+      <View style={{
+        backgroundColor: 'dodgerblue',
+        flexBasis: 100, // width or height depending on primary axis
+        //width: 100,
+        height: 100
+      }}></View>
+flex == flexGrow
+
+Absolute and Relative Positioning - relative to its current position without affecting the layout around it
+(assume primary axis is horizontal)
+top: 20 // move 20 indepent pixels down from the top of the primary axis
+top: -20 // move 20 indepent pixels up from the top of the primary axis
+also bottom, left, right
+default position: 'relative' // means relative to it's siblings (other items) under their parent
+position: 'absolute' // means relative to parent (as if the other (not the the other items))
+
+Exercises -
+Building a Welcome Screen
+Building a View Image Screen
+See Code backups for GPC and Mosh Solutions:
+C:\JerryC\Development\Courses\ReactNativePractice\projects\DoneWithit_Backups
+
+
+************************* Styling  ***********************
+Borders -
+
+Shadows -
+iOS and Droid differ:
+    // iOS Only: ignored by android
+    shadowColor: "grey",
+    shadowOffset: { width: 10, height: 10},
+    shadowOpacity: 1,
+    shadowRadius: 10,
+    // --end
+    elevation: 30, // android is NOT really any good with shadows
+
+Padding and Margins -
+
+Styling Text -
+Custom Fonts (Not being covered), but see: https://docs.expo.io/guides/using-custom-fonts/?redirected
+FontFamily: ? // iOS and Android have different fonts
+See https://github.com/react-native-training/react-native-fonts
+
+*** There is no Style inheritance in react native like in css
+However:
+
+How can we make sure that our text looks the same across different screens?
+Ans: Encapsulating Styles (Technique) -
+C:\JerryC\Development\Courses\ReactNativePractice\projects\DoneWithIt\app\components\AppText.js:
+-----
+import React from 'react';
+import { Text, StyleSheet, Platform} from 'react-native';
+
+function AppText({children}) {
+    return (
+        <Text style={styles.text}>{children}</Text>
+    );
+}
+
+const styles = StyleSheet.create({
+    text: {
+        fontSize: 18,
+        fontFamily: Platform.OS === "android" ? "Roboto" : "Avenir",
+    }
+});    
+
+export default AppText;
+-----
+App.js:
+:
+import AppText from "./app/components/AppText";
+
+export default function App() {
+  return (
+    <View style={styles.s1}>
+      <AppText>React Native is great!</AppText>
+    </View>
+  );
+}
+:
+-----
+
+Icons -
+https://icons.expo.fyi/
+Search for an icon or family...
+-----
+// lib installed by default when we create a proj with expo
+import {MaterialCommunityIcons} from '@expo/vector-icons';
+:
+    <View style={styles.s1}>
+      <MaterialCommunityIcons name="email" size={200} color="dodgerblue" />
+    </View>
+:
+-----
+
+Platform-specific Code -
+Alternative to ./app/components/AppText.js (implemented)
+is to instead have
+/app/components/AppText.ios.js AND /app/components/AppText.android.js (not implemented)
+
+Organizing Styles -
+***** Extra work without much gain
+
+Exercises -
+Improved Application
+
+********************************************************
+Here are the top three UI toolkits for React Native:
+React Native Elements (My Recommendation): https://react-native-elements.github.io/react-native-elements/
+React Native Paper: https://callstack.github.io/react-native-paper/
+Native Base: https://nativebase.io/
+********************************************************
+
+
+************************* Lists  ***********************
+FlatList -
+render a list of objects based on a key
+        <FlatList
+            data={messages}
+            keyExtractor={message => message.id.toString()}
+            renderItem={({ item }) =>
+                <ListItem   
+                    title={item.title}
+                    subTitle={item.description}
+                    image={item.image}
+                />
+            }
+        />
+
+Extracting the Screen Component -
+***** Adding more software for CONSTATNTS About Current PLATFORM <--------<<<<<<<
+$ npm i expo-constants
+> core-js@3.9.1 postinstall C:\JerryC\Development\Courses\ReactNativePractice\projects\DoneWithIt\node_modules\core-js
+> node -e "try{require('./postinstall')}catch(e){}"
+:
++ expo-constants@10.0.1
+added 15 packages from 7 contributors, removed 1 package, updated 14 packages and audited 1027 packages in 9.429s
+-----
+import Constants from 'expo-constants';
+    console.log(Constants);
+Object {
+  "addListener": [Function anonymous],
+  "appOwnership": "expo",
+  "deviceId": "171bf1c4-f7cc-46b9-ad8a-78a329fea1bc",
+  "deviceName": "Android SDK built for x86",
+  "deviceYearClass": 2013,
+  "executionEnvironment": "storeClient",
+  "experienceUrl": "exp://192.168.0.11:19000",
+  "expoVersion": "2.18.7",
+  "getWebViewUserAgentAsync": [Function anonymous],
+  "installationId": "171bf1c4-f7cc-46b9-ad8a-78a329fea1bc",
+  "intentUri": "exp://192.168.0.11:19000",
+  "isDetached": false,
+  "isDevice": false,
+  "isHeadless": false,
+  "linkingUri": "exp://192.168.0.11:19000",
+  "linkingUrl": "exp://192.168.0.11:19000",
+  "manifest": Object {
+    "_internal": Object {
+      "dynamicConfigPath": null,
+      "isDebug": false,
+      "packageJsonPath": "C:\\JerryC\\Development\\Courses\\ReactNativePractice\\projects\\DoneWithIt\\package.json",
+      "projectRoot": "C:\\JerryC\\Development\\Courses\\ReactNativePractice\\projects\\DoneWithIt",
+      "staticConfigPath": "C:\\JerryC\\Development\\Courses\\ReactNativePractice\\projects\\DoneWithIt\\app.json",
+    },
+    "android": Object {
+      "adaptiveIcon": Object {
+        "backgroundColor": "#FFFFFF",
+        "foregroundImage": "./app/assets/adaptive-icon.png",
+        "foregroundImageUrl": "http://192.168.0.11:19000/assets/./app/assets/adaptive-icon.png",
+      },
+    },
+    "assetBundlePatterns": Array [
+      "**/*",
+    ],
+    "bundleUrl": "http://192.168.0.11:19000/node_modules%5Cexpo%5CAppEntry.bundle?platform=android&dev=true&hot=false&minify=false",
+    "debuggerHost": "192.168.0.11:19000",
+    "description": "A marketplace for selling the things that you don't need any longer.",
+    "developer": Object {
+      "projectRoot": "C:\\JerryC\\Development\\Courses\\ReactNativePractice\\projects\\DoneWithIt",
+      "tool": "expo-cli",
+    },
+    "env": Object {
+      "EXPO_TARGET": "managed",
+    },
+    "hostUri": "192.168.0.11:19000",
+    "icon": "./app/assets/icon.png",
+    "iconUrl": "http://192.168.0.11:19000/assets/./app/assets/icon.png",
+    "id": "@jerrycarney/DoneWithIt",
+    "ios": Object {
+      "supportsTablet": true,
+    },
+    "isVerified": true,
+    "logUrl": "http://192.168.0.11:19000/logs",
+    "mainModuleName": "node_modules\\expo\\AppEntry",
+    "name": "DoneWithIt",
+    "orientation": "portrait",
+    "packagerOpts": Object {
+      "dev": true,
+      "devClient": false,
+      "hostType": "lan",
+      "https": false,
+      "lanType": "ip",
+      "minify": false,
+      "scheme": null,
+      "urlRandomness": null,
+    },
+    "platforms": Array [
+      "ios",
+      "android",
+      "web",
+    ],
+    "primaryColor": "#023C69",
+    "sdkVersion": "40.0.0",
+    "slug": "DoneWithIt",
+    "splash": Object {
+      "backgroundColor": "#ffffff",
+      "image": "./app/assets/splash.png",
+      "imageUrl": "http://192.168.0.11:19000/assets/./app/assets/splash.png",
+      "resizeMode": "contain",
+    },
+    "updates": Object {
+      "fallbackToCacheTimeout": 0,
+    },
+    "version": "1.0.0",
+    "web": Object {
+      "favicon": "./assets/favicon.png",
+    },
+    "xde": true,
+  },
+  "nativeAppVersion": "2.18.7",
+  "nativeBuildVersion": 143,
+  "platform": Object {
+    "android": Object {
+      "versionCode": null,
+    },
+  },
+  "removeListeners": [Function anonymous],
+  "sessionId": "1643d341-d2ef-462f-9d0c-d821a59a6559",
+  "statusBarHeight": 24, <--------------------------------------------------<<<<<<<<
+  "supportedExpoSdks": Array [
+    "40.0.0",
+    "39.0.0",
+    "38.0.0",
+    "37.0.0",
+  ],
+  "systemFonts": Array [
+    "normal",
+    "notoserif",
+    "sans-serif",
+    "sans-serif-light",
+    "sans-serif-thin",
+    "sans-serif-condensed",
+    "sans-serif-medium",
+    "serif",
+    "Roboto",
+    "monospace",
+  ],
+  "systemVersion": "10",
+}
+
+Therefore added a Screen component to be reused:
+-----
+import React from 'react';
+import Constants from 'expo-constants';
+import { SafeAreaView, StyleSheet, Platform, StatusBar } from 'react-native';
+
+function Screen({ children }) {
+    return (
+        <SafeAreaView style={styles.screen}>
+            {children}
+        </SafeAreaView>
+    );
+}
+
+const styles = StyleSheet.create({
+    screen: {
+        //paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
+        paddingTop: Constants.statusBarHeight,
+    }
+}); 
+
+export default Screen;
+-----
+
+Separators -
+ListItemSeparator.js
+-----
+import React from "react";
+import { StyleSheet, View } from "react-native";
+
+import colors from "../config/colors";
+
+function ListItemSeparator() {
+  return <View style={styles.separator} />;
+}
+
+const styles = StyleSheet.create({
+  separator: {
+    width: "100%",
+    height: 1,
+    backgroundColor: colors.light,
+  },
+});
+
+export default ListItemSeparator;
+-----
+ManageScreen.js
+-----
+:
+        <Screen>
+            <FlatList
+                data={messages}
+                keyExtractor={message => message.id.toString()}
+                renderItem={({ item }) => (
+                    <ListItem   
+                        title={item.title}
+                        subTitle={item.description}
+                        image={item.image}
+                    />
+                )}
+                ItemSeparatorComponent={ListItemSeparator}
+            />
+        </Screen>
+:
+-----
+
+Handling Selections -
+ListItem.js
+Added <TouchableHighlight> and (...,onPress) arg to be implemented by caller
+-----
+function ListItem({ title, subTitle, image, onPress }) {  
+  return (
+    <TouchableHighlight
+      underlayColor={colors.light}
+      onPress={onPress}
+    >
+      <View style={styles.container}>
+        <Image style={styles.image} source={image} />
+        <View>
+          <AppText style={styles.title}>{title}</AppText>
+          <AppText style={styles.subTitle}>{subTitle}</AppText>
+        </View>
+      </View>
+    </TouchableHighlight>
+  );
+}
+
+- Handling Swipes
+expo.io - GestureHandler: need a library installed
+(in stalling with expo makes sure installaiton is compatable in existing expo items)
+(expo install uses npm and yarn underneath)
+*********** Installation  <----------------<<<<<<<
+$ expo install react-native-gesture-handler
+:
+after click link: react-native-gesture-handler docs, Components, Swipeable
+- swipe left or right
+ListItem.js
+import Swipeable from 'react-native-gesture-handler/Swipeable';
+and wrap return with <Swipeable renderRightActions>
+and add renderRightActions as and arg-
+function ListItem({ title, subTitle, image, onPress, renderRightActions }) {
+renderRightActions={}:
+method that is expected to return an action panel that is going to be revealed from the right side when user swipes left. 
+
+Deleting an Item -
+
+Implementing Pull to Refresh -
+
+Exercises -
+AccountScreen
+ListingScreen
+
+
+************************* Input Components  ***********************
+TextInput -
+We need a state variable to hold the value: the state(props) hook
+
+Build AppTextInput -
+
+Swith -
+basically an on/off boolean
+
+Picker -
+Is part of the the react-native-community, so we can NOT use it with Expo; so,
+we need to build a Custom Picker from scratch.
+
+Handling Selections -
+
+
+************************* Forms  ***********************
+Built a Login Form
+- We can make it easier todo with
+\/
+
+Building Better Forms with Formik -
+A popular Library named: Formik (Build forms in React, without the tears)
+https://formik.org/docs/overview
+$ npm i formik     *************   <-------------<<<<< Software Install
+:
++ formik@2.2.6 (Mosh using 2.14)
+Formik tracks the form's state, so we don't need a bunch of useState(hook) variables
+-- VERY COOL
+
+Validation with Yup -
+NOTE: we used Joi in the React course for validation... Remember GPC (yes!)
+Yup is a popular Library for validation AND Formik has built-in for data validation with Yup
+https://www.npmjs.com/package/yup
+$ npm i yup     *************   <-------------<<<<< Software Install
+:
++ yup@0.32.9
+-- VERY COOL
+
+Building the ErrorMessage Component -
+easy
+
+The Touched State -
+easy
+
+Building the Field Component -
+import { useFormikContext } from 'formik'; //uses React Context to pass object
+function AppFormField( {name, ...otherProps} ) { //rest operator ...otherProps
+           <AppTextInput
+                onBlur={() => setFieldTouched(name) }
+                onChangeText={handleChange(name)}
+                {...otherProps} //spread operator <----------------<<<<<<
+            />
+            <ErrorMessage error={errors[name]} visible={touched[name]} />        
+TODO: Study Formik more deeply
+
+Building the SubmitButtom Component -
+easy
+
+Building the Form Component -
+easy
+
+Organizing Components -
+subfolder forms
+
+Exercises -
+RegisterScreen
+ListEditScreen
+placeholder color fixed in:
+---AppPicker and AppTextInput
+subfolder lists
+
+
+************************* Additional Improvements  ***********************
+Adding Chevrons -
+ListItem.js
+Added prop :
+  showChevrons,
+in code:
+          {showChevrons && <MaterialCommunityIcons name="chevron-right" size={25} color={colors.medium} />}
+		  
+Handling Long Text -
+ListItem.js
+            <AppText style={styles.title} numberOfLines={1}>{title}</AppText>
+            {subTitle && <AppText style={styles.subTitle} numberOfLines={3}>{subTitle}</AppText>}
+AppText.js
+function AppText({children, style, ...otherProps}) {  <-------<<<< Added rest ...otherProps for numberOfLines
+    return (
+        <Text style={[defaultStyles.text, style]} {...otherProps}>{children}</Text>
+    );
+}
+
+Improving the Messages Screen -
+Screen -
+        <SafeAreaView style={[styles.screen, style]}>
+            <View style={[styles.view, style]}>{children}</View>
+        </SafeAreaView>
+    view: {
+        flex: 1,
+    },
+	
+Input Components with Dynamic Width -
+updated appropriate code
+
+Flexible Architecture -
+added PickerItemComponent as an arg to AppFormPicker.js so you can pass the Component that you wish
+Created CategoryPickerItem that returns null, and
+in ListingEditScreen:
+        <AppFormPicker
+          items={categories}
+          name="category"
+          PickerItemCompnent={CategoryPickerItem}
+          placeholder="Category"
+          width="50%"
+        />
+		
+Building the CategoryPickerItem
+Note: Both CategoryPickerItem and PickerItem have the same API, have props:
+CategoryPickerItem({ label, onPress })
+PickerItem({ label, onPress })
+
+Custom Snippets -
+{
+	"Function Component": {
+		"prefix": "rnfc",
+		"body": [
+			"import React from 'react';",
+			"import { View, StyleSheet } from 'react-native';",
+			"",
+			"function ${TM_FILENAME_BASE}(props) {",
+    		"	return (",
+        	"		<View style={styles.container}>$0</View>",
+    		"	);",
+			"}",
+			"",
+			"const styles = StyleSheet.create({",
+    		"	container: {},",
+			"})",
+			"",
+			"export default ${TM_FILENAME_BASE};"
+		]
+	}
+	// Place your snippets for javascript here. Each snippet is defined under a snippet name and has a prefix, body and 
+	// description. The prefix is what is used to trigger the snippet and the body will be expanded and inserted. Possible variables are:
+	// $1, $2 for tab stops, $0 for the final cursor position, and ${1:label}, ${2:another} for placeholders. Placeholders with the 
+	// same ids are connected.
+	// Example:
+	// "Print to console": {
+	// 	"prefix": "log",
+	// 	"body": [
+	// 		"console.log('$1');",
+	// 		"$2"
+	// 	],
+	// 	"description": "Log output to console"
+	// }
+}
+
