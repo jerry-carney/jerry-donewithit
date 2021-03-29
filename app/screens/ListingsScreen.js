@@ -1,14 +1,15 @@
 import React from "react";
 import { FlatList, StyleSheet } from "react-native";
 
-import Screen from "../components/Screen";
 import Card from "../components/Card";
 import colors from "../config/colors";
+import routes from "../navigation/routes";
+import Screen from "../components/Screen";
 
 const listings = [
   {
     id: 1,
-    title: "Red jacket for sale that was signed by Henry Aaron on the day that he broke the home-run record",
+    title: "Red jacket for sale",
     price: 100,
     image: require("../assets/jacket.jpg"),
   },
@@ -20,7 +21,7 @@ const listings = [
   },
 ];
 
-function ListingsScreen(props) {
+function ListingsScreen({ navigation }) {
   return (
     <Screen style={styles.screen}>
       <FlatList
@@ -31,6 +32,7 @@ function ListingsScreen(props) {
             title={item.title}
             subTitle={"$" + item.price}
             image={item.image}
+            onPress={() => navigation.navigate(routes.LISTING_DETAILS, item)}
           />
         )}
       />
