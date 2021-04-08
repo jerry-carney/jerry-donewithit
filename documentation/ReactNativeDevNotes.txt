@@ -1,4 +1,13 @@
 REACT NATIVE DEVELOPER NOTES
+
+Follow Mosh for courses and discounts:
+https://twitter.com/moshhamedani
+https://www.facebook.com/programmingwithmosh/
+https://www.youtube.com/user/programmingwithmosh
+https://www.linkedin.com/in/mosh-hamedani/
+
+
+ULTIMATE REACT NATIVE: FUNDAMENTALS ********************************************************************
 Developing Mobile Apps
 
 Prerequisites: JavaScript, React
@@ -102,14 +111,14 @@ donewithit/.vscode/launch.json:
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Debug Android",
+            "name": "Debug Android",               <---------<<<<<< 19000
             "cwd": "${workspaceFolder}",
             "type": "reactnative",
             "request": "launch",
             "platform": "android"
         },
         {
-            "name": "Attach to packager",
+            "name": "Attach to packager",           <---------<<<<<< 19001
             "cwd": "${workspaceFolder}",
             "type": "reactnative",
             "request": "attach"
@@ -285,11 +294,6 @@ via my "Expo Go" App, and my app was displayed!
     "exclude": ["node_modules"]
 }
 
-Follow Mosh for courses and discounts:
-https://twitter.com/moshhamedani
-https://www.facebook.com/programmingwithmosh/
-https://www.youtube.com/user/programmingwithmosh
-https://www.linkedin.com/in/mosh-hamedani/
 
 
 ************************* Core Components and APIs ***********************
@@ -992,4 +996,606 @@ Custom Snippets -
 	// 	"description": "Log output to console"
 	// }
 }
+
+
+
+ULTIMATE REACT NATIVE: ADVANCED COMCEPTS **************************************************************
+
+************************* Native Features  ***********************
+Try to stick to Expo verses OS specific libraries, etc.    <------------<<<<<<  Expo Is Well Documented AND Supported
+https://docs.expo.io/
+
+ImagePicker -
+$ expo install expo-image-picker 
+Installing 1 SDK 40.0.0 compatible native module using npm.
+> npm install
+:
+ImagePicker.requestCameraRollPermissionsAsync  <------ DEPRECATED
+Below is another way 
+
+Asking for Permssion -
+- Class Components have: componentDidMount method (runs everytime the component get rendered)
+- Functional Components have: useEffect hook (runs everytime the component get rendered)
+
+ImagePicker.requestCameraRollPermissionsAsync  <------ DEPRECATED
+ImagePicker.requestCameraRollPermissionsAsync: Alias for Permissions.askAsync(Permissions.CAMERA).
+
+Permissions -
+Installing 1 SDK 40.0.0 compatible native module using npm.
+> npm install
+
+export default function App() {
+  //Class Components have: componentDidMount method (runs after the component output has been rendered to the DOM)
+  //Class Components have: componentWillUnmount method (runs when component is removed from the DOM)
+  //Functional Components have: useEffect hook (runs everytime the component get rendered)
+  //We want to only have useEffect the ONLY the FIRST time a component gets rendered.
+  //Answer: Make the array of dependencies empty: [].
+  const [imageUri, setImageUri] = useState();
+
+  const requestPermission = async () => {
+    //const { granted } = await Permissions.askAsync(Permissions.CAMERA,Permissions.MEDIA_LIBRARY);
+    const { granted } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (! granted)
+      alert("You need to enable permissions to access the library");
+  }
+
+  useEffect(() => {
+    requestPermission();
+  }, [])
+
+  selectImage = async () => {
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync();
+      if (! result.cancelled) {
+        setImageUri(result.uri);
+        console.log("Got image: ", {imageUri});
+      }
+    } catch (error) {
+      console.log("error reading an image: ", error);
+    }
+  }
+
+  return (
+    <Screen>
+      <Button title="Select Image" onPress={selectImage} />
+    <Image source={{ uri: imageUri }} style={{width:200, height: 200, margin:10}} />
+    </Screen>
+ );
+}
+
+Added/Developed:
+app/ImageInput.js
+app/ImageInputList.js (ScrollView horizontal)
+app/forms/AppFormImagePicker.js
+
+Updated:
+app/screens/ListingEditScreen.js (to include AppFormImagePicker at the top of the screen)
+
+Getting Users Location -
+$ expo install expo-location
+Installing 1 SDK 40.0.0 compatible native module using npm.
+> npm install
+
+In ListingEditScreen.js:
+import * as Location from "expo-location";
+:
+function ListingEditScreen() {
+  const [location, setLocation] = useState();
+
+  const getLocation = async () => {
+    const { granted } = await Location.requestPermissionsAsync();
+    if (! granted) return;
+    const { coords: { latitude, longitude } } = await Location.getLastKnownPositionAsync();
+    setLocation({ latitude, longitude });
+  }
+
+  useEffect(() => {
+    getLocation();
+  }, [])
+:
+onSubmit={(values) => console.log(location)}
+
+Object {
+  "latitude": 37.4219284,
+  "longitude": -122.0840116,
+}
+
+Custom Hooks -
+app/hooks/useLocations.js:
+import { useEffect, useState } from "react";
+import * as Location from "expo-location";
+
+export default useLocation = () => {
+  const [location, setLocation] = useState();
+
+  const getLocation = async () => {
+    try {
+      const { granted } = await Location.requestPermissionsAsync();
+      if (!granted) return;
+      const {
+        coords: { latitude, longitude },
+      } = await Location.getLastKnownPositionAsync();
+      setLocation({ latitude, longitude });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    getLocation();
+  }, []);
+
+  return location;
+};
+
+
+*************************** Navigation  (Routing) *************************
+*Navigate within the applicaiton (Routing)
+
+Installing React Navigation -
+https://reactnavigation.org/docs        <-------------<<<< Study Documentation
+
+$ npm install @react-navigation/native@5       <--------<<<< Mosh is using 5.3.2
++ @react-navigation/native@5.9.3
+
+$ expo install react-native-gesture-handler react-native-reanimated react-native-screens react-native-safe-area-context @react-native-community/masked-view
+Installing 5 SDK 40.0.0 compatible native modules using npm.
+> npm install
+
+Stack Navigator -
+$ npm install @react-navigation/stack@5        <--------<<<< Mosh is using 5.3.5
++ @react-navigation/stack@5.14.3
+
+Navigating Between Screens -
+Passing Parameters to Routes -
+Setting Screen Titles - 
+Customizing Headers -
+
+Creating a TabNavigator -
+$ npm install @react-navigation/bottom-tabs@5       <--------<<<< Mosh is using 5.4.4
++ @react-navigation/bottom-tabs@5.11.8
+
+Creating Custom Tabs -
+Nesting Navigators -
+
+Exercises -
+GPC-TODO
+
+
+******************************* Networking *****************************
+
+Setting up the backend ********************************
+Doneloaded Backend.zip which is a node project with canned json data
+ReactNativePractice/projects/DownWithIt (The Front End  I'm coding in React Native)
+ReactNativePractice/projects/Backend (The Back End coded by Mosh with canned JSON data) -
+This process runs on port 9000. It loads its canned data into an in memory database,
+and any CRUD during a session will be LOST.  <----------------------------<<<<<<<           ********
+
+I unzipped Backed.zip in my downloads/ dir and upzipped it. Then I copied the Backend project to location stated above.
+Cmd window to ../ReactNativePractice/projects/Backend dir, then:
+$ cmd .
+Backend node project open in VS Code. Then in the terminal window, install its dependencies:
+$ npm i
+...added 286 packages from 250 contributors and audited 287 packages in 5.885s
+Backend/config/development.json:
+{
+  "assetsBaseUrl": "http://192.168.0.14:9000/assets/",
+  "port": 9000
+}
+$ ipconfig
+my IPv4 address is: 192.168.0.11, therefore up development.json to:
+{
+  "assetsBaseUrl": "http://192.168.0.11:9000/assets/",
+  "port": 9000
+}
+
+To start the Backend Server:
+$ node index.js
+Server started on port 9000...
+Setting up the backend ********************************
+
+Calling APIs Using ApiSauce -   VERY COOL!  
+https://github.com/infinitered/apisauce     <---------------------<<<<<
+It a wrapper around Axios. Axios + standardized errors + request/response transforms(no try/catch).
+$ npm i apisauce
++ apisauce@2.0.1
+
+Fetching Data (apisauce) -
+
+Inspecting API calls: React Native Debugger -
+The standalone app based on official debugger of React Native, and includes React Inspector / Redux DevTools
+donewithit/.vscode/launch.json:
+ "name": "Debug Android",               <---------<<<<<< 19000
+ "name": "Attach to packager",         <---------<<<<<< 19001
+--- downloaded 
+https://github.com/jhen0409/react-native-debugger/releases/rn-debugger-windows-x64.zip
+to C:\JerryC\Development\softwareDownloads
+Executable: C:\JerryC\Development\softwareDownloads\rn-debugger-windows-x64\react-native-debugger.exe
+Listen on port: 19000
+*****NOTE: Runs okay showing network traffic, then fails to connect ??????  TODO
+----- message inside React Native Debugger  - Connected (port 19000)
+DevTools v3 is incompatible with this version of React,
+you need manually upgrade React Native Debugger to v0.11. (Please visit the Release page)
+
+Upgrade to the latest React DevTools:
+npm install -d react-devtools       <---------<<< I did NOT do this (I don't want to break anything now) *****
+-----
+
+Handling Errors(apisauce) -
+- Between apisauce and the Backend
+I was getting a several minute DELAY for the error msg "could not get listing" (Purposely Shutdown Backend)
+-----
+Fix: Add 10 second timeout to apisauce create:
+import { create } from 'apisauce';
+
+const apiClient = create({
+    baseURL: "http://111.222.0.33:9000/api/",
+    timeout: 10000,
+});
+
+export default apiClient;
+-----
+
+Showing an Activity Indicator -
+      <ActivityIndicator animating={loading} size="large" color="blue" />
+
+Building a Nice Activity Indicator -
+https://lottiefiles.com/
+Found a loading amination and downloaded it a a lottie json file,
+Add it to our project,
+Render it used a special component in EXPO
+https://docs.expo.io/versions/latest/
+$ expo install lottie-react-native    ****** NOTE: Mosh's lottie animation did NOT work v2.
+Installing 1 SDK 40.0.0 compatible native module using npm.
+added 4 packages from 4 contributors and audited 1074 packages in 4.605s
+****** NOTE: lottie animation did NOT work for me a well
+Mosh provided a loader.json file the was place in and used from
+../app/assets/animations/loader.json           <-------<<<<  WORKED: Red spinner in middle of screen
+
+Creating a Reusable Hook -
+useApi.js, ListingsScreen.js
+- Abstracted the data fetch from Listings.js to useApi.js
+
+Exercises -
+
+$ npm install react-native-progress
++ react-native-progress@4.1.2
+
+Added UploadScreen.js
+
+
+******************************* Offline Support *****************************	
+Detecting Network Status -
+$ expo install @react-native-community/netinfo
+added 1 package from 2 contributors and audited 1078 packages in 3.453s
+
+import NetInfo, { useNetInfo } from '@react-native-community/netinfo';
+:
+  NetInfo.fetch().then((netInfo) => console.log(netInfo));
+Object {
+  "details": Object {
+    "bssid": "02:15:b2:00:01:00",
+    "frequency": 2447,
+    "ipAddress": "10.0.2.16",
+    "isConnectionExpensive": false,
+    "ssid": "AndroidWifi",
+    "strength": 99,
+    "subnet": "255.255.255.255",
+  },
+  "isConnected": true,
+  "isInternetReachable": true,
+  "isWifiEnabled": true,
+  "type": "wifi",
+}
+
+AsyncStorage -
+$ expo install @react-native-async-storage/async-storage
++ @react-native-async-storage/async-storage@1.15.0
+-----
+  const demo = async () => {
+    try {
+      await AsyncStorage.setItem('person', JSON.stringify({ id: 1, name: 'Jerry'}));
+      const value = await AsyncStorage.getItem('person');
+      const person = JSON.parse(value);
+      console.log("Person:", person);
+    } catch (error) {
+      console.log("Async setItem failed: ", error);
+    }
+  }
+  demo();
+-----
+
+Inspecting AsyncStorage -
+Ran React Native Debugger - Connected (port 19000)
+> showAsyncStorageContentInDev()
+index	content
+person	"{"id":1,"name":"Jerry"}"
+> $reactNative.AsyncStorage.clear()
+Promise {_U: 0, _V: 0, _W: null, _X: null}
+> showAsyncStorageContentInDev()
+[RNDebugger] No AsyncStorage content.
+
+$ npm i moment
++ moment@2.29.1
+
+Implementing the Cache Layer -
+Created app/utility/cache.js: see code
+
+Caching Sucessful Request Data -
+app/api/client.js
+-----
+import { create } from 'apisauce';
+import cache from "../utility/cache";
+
+const apiClient = create({
+    baseURL: "http://192.168.0.11:9000/api/",
+    timeout: 10000,
+});
+
+const get = apiClient.get;
+apiClient.get = async (url, params, axiosConfig) => {
+    const response = await get(url, params, axiosConfig);
+
+    console.log("BACKEND STATUS****************: ", response.ok);
+    if (response.ok) {
+        cache.store(url, response.data);
+        return response;
+    }
+
+    const data = await cache.get(url);
+    return data ? { ok: true, data } : response;
+};
+
+export default apiClient;
+-----
+
+Caching Images -
+NOTE: Until now, are of a images are displayed through React Native <Image /> (stored locally)
+---
+Mosh's Best way: FastImage, https://github.com/DylanVann/react-native-fast-image
+HOWERVER, At time of video it is NOT available for EXPO apps.
+NOTE: 2021/04/04 Looks to be available (TODO: Try it later)
+---
+Alternative; https://github.com/wcandillon/react-native-expo-image-cache
+***** Stores images in the file system of the device. *****
+$ npm i react-native-expo-image-cache
++ react-native-expo-image-cache@4.1.0
+--
+This component relys on Expo Blur
+$ expo install expo-blur
+added 1 package from 1 contributor and audited 1083 packages in 3.276
+NOTE: Has a slightly different API than React Native <Image />
+--
+Code updates:
+Card.js
+-----
+BEFORE:
+import { Image } from 'react-native';
+function Card({ title, subTitle, imageUrl, onPress }) {
+<Image style={styles.image} source={{uri: imageUrl}} />
+AFTER:
+import { Image } from 'react-native-expo-image-cache';
+function Card({ title, subTitle, imageUrl, onPress, thumbnailUrl }) {
+<Image style={styles.image} tint="light" review={{ uri: thumbnailUrl }} uri={imageUrl} />
+-----
+ListingsScreen.js
+-----
+Added the following param to <Card ... />
+thumbnailUrl={item.images[0].thumbnailUrl
+-----
+SHUT DOWN backend
+Restart App: Card images should be retrieved from device's local storage.
+Works for a few minutes, then FAILS to after about 5 minutes (which is the time limit in cache.js)
+
+CONCLUSION:
+- react-native-expo-image-cache does NOT Work, or
+- device local strorage only caches for about 5 minutes as well. 
+- Too close for a co-incidence; therefore, (I believe react-native-expo-image-cache does not work)
+
+THE WAY TO TELL FOR SURE:
+- Take out the usage of cache.js, then run the App: TODO
+
+
+Caching with Redux -
+Redux: state management library with a large eco-system.
+Mosh: Redux complexity is not worth using for caching; but good for apps with a complex data flow.
+
+Storing User Actions When Offline -
+Not worth the complexity, unless you really, really need it try:
+https://docs.expo.io/guides/using-firebase/, or
+https://realm.io/
+
+E.g.: Twitter does NOT have Offline Support.
+
+"Simplicity is the ultimate sophistication"
+
+Showing Offline Notice -
+Rendering when I comment out conditional
+See OfficelineNotice.js code ...
+-----
+:
+function OfflineNotice(props) {
+  //const netInfo = useNetInfo();
+  //console.log("netInfo: ", netInfo);
+
+  //if (netInfo.type !== "unknown" && netInfo.isInternetReachable === false)
+    return (
+      <View style={styles.container}>
+        <AppText style={styles.text}>No Internet Connection</AppText>
+      </View>
+    );
+
+  //return null;
+ :
+  container: {
+    alignItems: "center",
+    backgroundColor: colors.primary,
+	elevation: (Platform.OS === 'android') ? 1 : 0,
+    height: 50,
+    justifyContent: "center",
+    position: "absolute",
+    top: Constants.statusBarHeight,
+    width: "100%",
+    zIndex: 1,
+  },
+  -----
+Apps.js
+   <>
+      <NavigationContainer theme={navigationTheme}>
+        <AppNavigator />
+      </NavigationContainer>
+    </>
+  
+
+******************************* Authentication *****************************
+Popular Providers -  $$$, (API may change)
+Amplify by Amazon,
+Firebase by Google,
+Auth0,
+--- Other,
+Jango,
+Ace with Net,
+Rails
+
+Using Mosh's technique that is very similiar to the above providers/technologies
+Chrome Extension Talend:
+POST http://localhost:9000/api/auth
+{
+  "email" : "jerry@domain.com",
+  "password" : "12345"
+}
+Response: AuthToken
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2...
+
+auth.js
+-----
+import client from './client';
+
+const login = (email, password) => client.post("/auth", {email, password});
+
+export default {
+    login,
+}
+-----
+LoginScreen.js
+Made call to above login.
+OK: User passed login, console.log(response.data); //authToken
+!OK: Display ErrorMessage
+
+https://jwt.io/
+JASON Web Token
+place authToken on left, then see the decoded JSON on the right. HEADER, PAYLOAD, VERIFY SIGNATURE
+
+$ npm i jwt-decode      // decode JASON Web Tokens (JWT)
++ jwt-decode@3.1.2
+
+Using AuthToken for use Login/Logout -
+
+App.js
+-----
+  const [user, setUser] = useState();
+  return(
+    <AuthContext.Provider value={{ user, setUser }}>
+      <OfflineNotice />
+      <NavigationContainer theme={navigationTheme}>
+        {user ? <AppNavigator /> : <AuthNavigator />}
+      </NavigationContainer>
+    </AuthContext.Provider>
+  );
+-----
+context.js
+-----
+import React from "react";
+
+const AuthContext = React.createContext();
+
+export default AuthContext;
+-----
+Updated Login and Account Screens to use AuthContext
+
+Persisting the Auth State Accross Restatrts -
+$ expo install expo-secure-store
+Installing 1 SDK 40.0.0 compatible native module using npm.
+audited 1085 packages in 3.376s
+
+storage.js:
+Secure store of the JWT authToken
+
+Updated Login and Account Screens
+
+Contolling ther Spash Screen -
+$ expo install expo-app-loading
++ expo-app-loading@1.0.1
+app.js
+-----
+import AppLoading from 'expo-app-loading';
+
+  export default function App() {
+    const [user, setUser] = useState();
+    const [isReady, setIsReady] = useState(false);
+
+    restoreToken = async () => {
+      const token = await authStorage.getToken();
+      if (! token) return;
+      setUser(authStorage.getUser());
+    }
+
+  if (! isReady) 
+    return (<AppLoading startAsync={restoreToken} onFinish={() => setIsReady(true)} onError={console.warn()} />);
+
+  return(
+    <AuthContext.Provider value={{ user, setUser }}>
+      <OfflineNotice />
+      <NavigationContainer theme={navigationTheme}>
+        {user ? <AppNavigator /> : <AuthNavigator />}
+      </NavigationContainer>
+    </AuthContext.Provider>
+  );
+-----
+Result: You see a nice image while the app is loading
+
+Refactoring -
+Creating a Custom Hook -
+app/auth/useAuth.js
+-----
+import { useContext } from "react";
+import jwtDecode from "jwt-decode";
+
+import AuthContext from "./context";
+import authStorage from "./storage";
+
+export default useAuth = () => {
+  const { user, setUser } = useContext(AuthContext);
+
+  const logIn = (authToken) => {
+    const user = jwtDecode(authToken);
+    setUser(user);
+    authStorage.storeToken(authToken);
+  };
+
+  const logOut = () => {
+    setUser(null);
+    authStorage.removeToken();
+  };
+
+  return { user, logIn, logOut };
+};
+-----
+
+Calling Protected APIs -
+Example an API call the requires an AuthToken
+
+Exercise -
+Implementing the Registration - Done!
+
+Showing an Activity Indicator -
+Adding a Overlay -
+
+
+
+
+
+
+
+
 

@@ -123,6 +123,9 @@ import Card from "./app/components/Card";
 import AccountScreen from "./app/screens/AccountScreen";
 import Icon from "./app/components/Icon";
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
+import NetInfo, { useNetInfo } from '@react-native-community/netinfo';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import AppLoading from 'expo-app-loading';
 
 import Screen from "./app/components/Screen";
 import AppPicker from "./app/components/AppPicker";
@@ -140,6 +143,10 @@ import ImageInputList from "./app/components/ImageInputList";
 import AuthNavigator from "./app/navigation/AuthNavigator";
 import navigationTheme from "./app/navigation/navigationTheme";
 import AppNavigator from "./app/navigation/AppNavigator";
+import AppText from "./app/components/AppText";
+import OfflineNotice from "./app/components/OfflineNotice";
+import AuthContext from "./app/auth/context";
+import authStorage from "./app/auth/storage";
 
 /*
 const categories = [
@@ -150,8 +157,31 @@ const categories = [
 */
 //const image = { uri: 'https://reactjs.org/logo-og.png' };
 
-export default function App() {
-  return (
+
+  /*
+  const demo = async () => {
+    try {
+      await AsyncStorage.setItem('person', JSON.stringify({ id: 1, name: 'Jerry'}));
+      const value = await AsyncStorage.getItem('person');
+      const person = JSON.parse(value);
+      console.log("Person:", person);
+    } catch (error) {
+      console.log("Async setItem failed: ", error);
+    }
+  }
+
+  demo();
+
+  const netInfo = useNetInfo();
+  return netInfo.isInternetReachable ? <View><AppText>yes</AppText></View> : <View><AppText>yes</AppText></View>;
+  */
+  //const netInfo = useNetInfo();
+  //NetInfo.fetch().then((netInfo) => console.log(netInfo));
+  // componentDidMount
+  //const unsubscribe = NetInfo.addEventListener(netInfo => console.log(netInfo));
+
+  // componentWillUmount
+  //unsubscribe();
 
   //const [category, setCategory] = useState(categories[0]);
   //return (
@@ -189,16 +219,35 @@ export default function App() {
   //<LoginScreen />
   //<RegisterScreen />
   //<ListingEditScreen />
+
+  export default function App() {
+    const [user, setUser] = useState();
+    const [isReady, setIsReady] = useState(false);
+
+    restoreUser = async () => {
+      const user = await authStorage.getUser();
+      if (user) setUser(user);
+    }
+
+  if (! isReady) 
+    return (<AppLoading startAsync={restoreUser} onFinish={() => setIsReady(true)} onError={console.warn()} />);
+
+  return(
+    <AuthContext.Provider value={{ user, setUser }}>
+      <OfflineNotice />
+      <NavigationContainer theme={navigationTheme}>
+        {user ? <AppNavigator /> : <AuthNavigator />}
+      </NavigationContainer>
+    </AuthContext.Provider>
+  );
   
-  <NavigationContainer theme={navigationTheme}>
-    <AppNavigator />
-  </NavigationContainer>
-  
- );
 }
 
-
-
+/*
+<NavigationContainer theme={navigationTheme}>
+<AppNavigator />
+</NavigationContainer>
+*/
 
 
 
