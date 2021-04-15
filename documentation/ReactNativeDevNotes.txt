@@ -1592,6 +1592,338 @@ Showing an Activity Indicator -
 Adding a Overlay -
 
 
+******************************* Notification *****************************
+My physical smart phone: Samsung Galaxy 6 (Android version: 7.0)
+My Android Virtual Device: Pixel 2 (Note: Advanced Config: Boot option: Cold boot)
+
+Providers -
+- Expo's Push Notificaiton Service  <-----<<< Easiest without alot of prep
+- One Signal
+- Firebase Clould Messaging
+- Amazon's Simple Notification Serivice (SNS)
+
+INSTALL Expo Notifications -
+$ expo install expo-notifications
+added 8 packages from 6 contributors and audited 1098 packages in 4.433s
+
+UPDATE -
+app.json:
+    "android": {
+      "useNextNotificationsApi": true,
+:
+
+https://expo.io/notifications
+- Tool to send test push notifications
+
+*******************   Mosh's Notifications NOT working     ***************
+He is using:
+import Notifications from 'expo';
+It should be:
+import * as Notifications from 'expo-notifications';
+
+I used code from the following URLs to make Notification work SUCCESSFULLY.
+https://docs.expo.io/versions/v40.0.0/sdk/notifications/
+https://docs.expo.io/push-notifications/overview/ ... follow guide from here
+https://docs.expo.io/push-notifications/sending-notifications/
+:
+https://docs.expo.io/push-notifications/receiving-notifications/
+:
+Tool to send a test Notificaiton:
+https://expo.io/notifications
+
+app/hooks/useNotificaitons.js
+-----
+import { useEffect, useRef, useState } from "react";
+import * as Notifications from 'expo-notifications';
+
+import expoPushTokensApi from "../api/expoPushTokens";
+
+// Required
+Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowAlert: true,
+      shouldPlaySound: true,
+      shouldSetBadge: false,
+    }),
+});
+
+export default useNotifications = () => {
+    const [notification, setNotification] = useState(false);
+    const notificationListener = useRef();
+    const responseListener = useRef();
+
+    useEffect(() => {
+        registerForPushNotifications();
+
+        // This listener is fired whenever a notification is received while the app is foregrounded
+        notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
+            setNotification(notification);
+        });
+  
+        // This listener is fired whenever a user taps on or interacts with a notification (works when app is foregrounded, backgrounded, or killed)
+        responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
+            console.log(response.notification.request.content.body);
+        });
+  
+        return () => {
+            Notifications.removeNotificationSubscription(notificationListener.current);
+            Notifications.removeNotificationSubscription(responseListener.current);
+        };
+
+    }, []);
+    
+    
+    const registerForPushNotifications = async () => {
+        try {
+            const permissions = await Notifications.getPermissionsAsync();
+            if (! permissions.granted) {
+                const finalPermissions = await Notifications.requestPermissionsAsync();
+                if (! finalPermissions.granted) {
+                    console.log("permissions NOT granted!");
+                    return;
+                }
+            }
+            console.log("permissions granted!");
+     
+            const token = await Notifications.getExpoPushTokenAsync();
+            expoPushTokensApi.register(token.data);
+    
+        } catch (error) {
+            console.log("Error getting a push token", error);
+        }
+    };
+}
+-----
+
+******************************* Distribution *****************************
+App Icon -
+Apple Icon Design Guideline:
+https://developer.apple.com/design/human-interface-guidelines/ios/icons-and-images/app-icon/
+
+Android Icon Design Guideline:
+https://developer.android.com/guide/practices/ui_guidelines/icon_design_adaptive
+
+/app/assets/icon.png        <------<<< Must be png file and exactly 1024 x 1024 pixels
+app.json:
+    "icon": "./app/assets/icon.png",
+
+Optimizing Assets -
+app/assets/adaptive-icon
+- remove unneccessary files
+- optimize sizes ( I did NOT do the below steps)        <---------------<<<<<<<
+$ npm i -g sharp-cli
+$ npx expo-optimize 
+
+
+Optimizing JavaScript Bundle -
+Check for more Lite-Weight Alternatives
+Added (installed) VS Code Extension "Import Cost"
+- Display import/require package size in editor
+cache.js
+-----
+import moment from 'moment';  290.1K (gzipped: 72.3K)
+:
+const isExpired = (item) => {
+  const now = moment(Date.now());
+  const storedTime = moment(item.timestamp);
+  return now.diff(storedTime, "minutes") > expiryInMinutes;
+};
+-----
+$ npm i  dayjs
++ dayjs@1.10.4
+
+Use dayjs inplace of moment:
+cache.js
+-----
+import dayjs from 'dayjs';  6.8K (gzipped: 3K)
+:
+const isExpired = (item) => {
+  const now = dayjs();
+  const storedTime = dayjs(item.timestamp);
+  return now.diff(storedTime, "minute") > expiryInMinutes;
+};
+-----
+
+Error Reporting -
+Good Altenative to Sentry is BugSnag
+https://www.bugsnag.com/
+- I did not install it or use it in my code, [TODO when I do a Prod Build]
+
+Environment Management -
+app/config/settings.js
+-----
+import Constants from "expo-constants";
+
+const settings = {
+  dev: {
+    apiUrl: "http://192.168.0.11:9000/api/",
+  },
+  staging: {
+    apiUrl: "http://192.168.0.11:9000/api/",
+  },
+  prod: {
+    apiUrl: "http://192.168.0.11:9000/api/",
+  },
+};
+
+const getCurrentSettings = () => {
+  if (__DEV__) return settings.dev;
+  if (Constants.manifest.releaseChannel === "staging") return settings.staging;
+  return settings.prod;
+};
+
+export default getCurrentSettings();
+-----
+client.js
+-----
+import settings from "../config/settings";
+REPLACE:
+baseURL: "http://192.168.0.11:9000/api/",
+WITH:
+baseURL: settings.apiUrl,
+-----
+
+Publishing -
+app.json:
+  "expo": {
+    "name": "JerrycDoneWithIt",
+    "slug": "JerrycDoneWithIt",
+    "privacy": "unlisted",     <---------------<<<< Hides app from search results
+
+Publishing on Expo:	
+$ expo publish --release-channel staging
+- Expo SDK: 40.0.0        
+- Release channel: staging
+- Workflow: Managed       
+
+Building optimized bundles and generating sourcemaps...
+Starting Metro Bundler
+Finished building JavaScript bundle in 37066ms.
+
+Bundle                     Size
+┌ index.ios.js          2.04 MB
+├ index.android.js      2.05 MB
+├ index.ios.js.map      6.87 MB
+└ index.android.js.map  6.88 MB
+
+� JavaScript bundle sizes affect startup time. Learn more: https://expo.fyi/javascript-bundle-sizes
+
+Analyzing assets
+Saving assets
+uploading \app\assets\jerry.png
+
+Processing asset bundle patterns:
+- C:\JerryC\Development\Courses\ReactNativePractice\projects\DoneWithIt\**\*
+
+Uploading JavaScript bundles
+Publish complete
+
+�  Manifest: https://exp.host/@jerrycarney/JerrycDoneWithIt/index.exp?release-channel=staging&sdkVersion=40.0.0 Learn more: https://expo.fyi/manifest-url
+⚙️   Project page: https://expo.io/@jerrycarney/JerrycDoneWithIt?release-channel=staging Learn more: https://expo.fyi/project-page
+
+In my browser, I went to  https://expo.io/@jerrycarney/JerrycDoneWithIt?release-channel=staging 
+With my phone I use Expo Go to Scan QR Code (on this url), and the app launched SUCCESSFULLY.
+NOTE: The BankEnd is RUNNING, otherwise it app would NOT have worked.
+
+
+Building -
+Using "Expo's Build Service"
+app.json:
+    "android": {
+      "package" : "com.jerryc.jerrycdonewithit",      <--------- Added. Uniquely identifies app in Google Play Store
+      "versionCode": 1,           <--------- Added. Version used internally in Google Play Store. Incr upon new releases
+      "useNextNotificationsApi": true,
+      "adaptiveIcon": {
+        "foregroundImage": "./app/assets/adaptive-icon.png",
+        "backgroundColor": "#FFFFFF"
+      }
+
+$ expo build:android
+√ Choose the build type you would like: » apk
+Checking if there is a build in progress...  
+
+Accessing credentials for jerrycarney in project JerrycDoneWithIt
+√ Would you like to upload a Keystore or have us generate one for you?
+If you don't know what this means, let us generate it! :) » Generate new keystore
+Keystore updated successfully
+
+- Expo SDK: 40.0.0
+- Release channel: default
+- Workflow: Managed
+
+Building optimized bundles and generating sourcemaps...
+Starting Metro Bundler
+Finished building JavaScript bundle in 7179ms.
+
+Bundle                     Size
+┌ index.ios.js          2.04 MB
+├ index.android.js      2.05 MB
+├ index.ios.js.map      6.87 MB
+└ index.android.js.map  6.88 MB
+
+� JavaScript bundle sizes affect startup time. Learn more: https://expo.fyi/javascript-bundle-sizes
+
+Analyzing assets
+Saving assets
+No assets changed, skipped.
+
+Processing asset bundle patterns:
+- C:\JerryC\Development\Courses\ReactNativePractice\projects\DoneWithIt\**\*
+
+Uploading JavaScript bundles
+Publish complete
+
+�  Manifest: https://exp.host/@jerrycarney/JerrycDoneWithIt/index.exp?sdkVersion=40.0.0 Learn more: https://expo.fyi/manifest-url
+⚙️   Project page: https://expo.io/@jerrycarney/JerrycDoneWithIt Learn more: https://expo.fyi/project-page
+
+Checking if this build already exists...
+
+Build started, it may take a few minutes to complete.
+You can check the queue length at https://expo.io/turtle-status
+
+You can monitor the build at
+
+ https://expo.io/accounts/jerrycarney/builds/150c5575-8ba6-40ae-b260-24bc8a4dd12a
+
+Waiting for build to complete.
+You can press Ctrl+C to exit. It won't cancel the build, you'll be able to monitor it at the printed URL.
+√ Build finished.
+
+Successfully built standalone app: https://expo.io/artifacts/c2b233ad-4366-4100-923b-d6fbf62c5ea5
+PS C:\JerryC\Development\Courses\ReactNativePractice\projects\DoneWithIt>
+
+- We Need the Keystore the Expo generated: Needed to publish new versions of app for Google Play Store
+$ 
+
+Over the Air Updates (Easy)
+- Simply increment VersionCode
+- And Republish App (The Google Play Store will AUTOMATICALLY recognize and  update it)
+- DO NOT LOSE IT
+$ expo fetch:android:keystore
+Keystore credentials
+  Keystore password: saved elsewhere
+  Key alias:         saved elsewhere
+  Key password:      saved elsewhere
+
+  Path to Keystore:  C: saved elsewhere
+ 
+ 
+I did NOT DISTRIBUTE app to Google Play Store (REMEMBER: It will not work without the BackEnd)
+Distributing to the Google Play Store 
+https://docs.expo.io/distribution/uploading-apps/
+
+Additonal Resources -
+Expo's documentation is your first step to distributing your apps. Always check the documentation for the updated instructions:
+https://docs.expo.io/distribution/introduction/
+
+If you want to automate your app deployment, consider FastLane:
+https://fastlane.tools/
+
+This blog posts shows how you can use Fastlane to deploy Expo apps:
+https://blog.expo.io/automating-standalone-expo-app-builds-and-deployments-with-fastlane-exp-and-exptool-9b2f5ad0a2cd
+
+
+
 
 
 
