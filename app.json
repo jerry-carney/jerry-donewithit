@@ -21,6 +21,8 @@
       "supportsTablet": true
     },
     "android": {
+      "package" : "com.jerryc.jerrycdonewithit",
+      "versionCode": 1,
       "useNextNotificationsApi": true,
       "adaptiveIcon": {
         "foregroundImage": "./app/assets/adaptive-icon.png",
