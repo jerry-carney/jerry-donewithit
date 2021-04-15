@@ -1,9 +1,10 @@
 import { create } from 'apisauce';
 import cache from "../utility/cache";
 import authStorage from "../auth/storage";
+import settings from "../config/settings";
 
 const apiClient = create({
-    baseURL: "http://192.168.0.11:9000/api/",
+    baseURL: settings.apiUrl,
     timeout: 5000,
 });
 
@@ -17,7 +18,7 @@ const get = apiClient.get;
 apiClient.get = async (url, params, axiosConfig) => {
     const response = await get(url, params, axiosConfig);
 
-    console.log("client:BACKEND STATUS****************: ", response.ok);
+    console.log("client.get:BACKEND STATUS****************: ", response.ok);
     if (response.ok) {
         cache.store(url, response.data);
         return response;

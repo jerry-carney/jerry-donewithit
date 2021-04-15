@@ -1,16 +1,32 @@
 import React from "react";
-import { View, Image, StyleSheet } from "react-native";
-import AppText from "../components/AppText";
+import {
+  View,
+  StyleSheet,
+  KeyboardAvoidingView,
+  Platform,
+} from "react-native";
+import { Image } from "react-native-expo-image-cache";
 
-import ListItem from "../components/lists/ListItem";
 import colors from "../config/colors";
+import ContactSellerForm from "../components/ContactSellerForm";
+import ListItem from "../components/lists/ListItem";
+import AppText from "../components/AppText";
 
 function ListingDetailsScreen({ route }) {
   const listing = route.params;
-
+ 
   return (
-    <View>
-      <Image style={styles.image} source={{uri : listing.images[0].url}} />
+    <KeyboardAvoidingView
+      style={styles.keyboard}
+      behavior="position"
+      keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 100}
+    >
+      <Image
+        style={styles.image}
+        preview={{ uri: listing.images[0].thumbnailUrl }}
+        tint="light"
+        uri={listing.images[0].url}
+      />
       <View style={styles.detailsContainer}>
         <AppText style={styles.title}>{listing.title}</AppText>
         <AppText style={styles.price}>${listing.price}</AppText>
@@ -21,18 +37,23 @@ function ListingDetailsScreen({ route }) {
             subTitle="5 Listings"
           />
         </View>
+        <ContactSellerForm listing={listing} />
       </View>
-    </View>
+
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
+  keyboard: {
+    flex: 1,
+  },
   detailsContainer: {
-    padding: 20,
+    padding: 10,
   },
   image: {
     width: "100%",
-    height: 300,
+    height: 250,
   },
   price: {
     color: colors.secondary,
@@ -45,7 +66,7 @@ const styles = StyleSheet.create({
     fontWeight: "500",
   },
   userContainer: {
-    marginVertical: 40,
+    marginVertical: 10,
   },
 });
 
